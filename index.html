@@ -31,6 +31,12 @@
   const close = () => { player.pause(); player.currentTime = 0; modal.classList.remove('open'); };
   document.getElementById('close').onclick = close;
   modal.onclick = e => { if (e.target === modal) close(); };
+  // Abre y reproduce solo al cargar; si el navegador bloquea el audio, arranca en silencio
+  function autoplay() {
+    modal.classList.add('open');
+    player.play().catch(() => { player.muted = true; player.play().catch(() => {}); });
+  }
+  window.addEventListener('load', autoplay);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 </script>
 </body>
