@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video</title>
+<style>
+  body{font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0}
+  a{font-size:1.25rem;color:#0a66c2;cursor:pointer;text-decoration:underline}
+  #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);place-items:center;z-index:10}
+  #modal.open{display:grid}
+  #box{position:relative;width:min(90vw,900px)}
+  video{width:100%;border-radius:8px;background:#000}
+  #close{position:absolute;top:-36px;right:0;background:none;border:0;color:#fff;font-size:2rem;cursor:pointer}
+</style>
+</head>
+<body>
+  <a id="open">▶ Ver video</a>
+
+  <div id="modal">
+    <div id="box">
+      <button id="close" aria-label="Cerrar">&times;</button>
+      <video id="player" src="video.mp4" controls playsinline></video>
+    </div>
+  </div>
+
+<script>
+  const modal = document.getElementById('modal');
+  const player = document.getElementById('player');
+  document.getElementById('open').onclick = () => { modal.classList.add('open'); player.play(); };
+  const close = () => { player.pause(); player.currentTime = 0; modal.classList.remove('open'); };
+  document.getElementById('close').onclick = close;
+  modal.onclick = e => { if (e.target === modal) close(); };
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+</script>
+</body>
+</html>
