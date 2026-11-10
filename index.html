@@ -3,41 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Video</title>
+<title>Manuales de uso</title>
 <style>
-  body{font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0}
-  a{font-size:1.25rem;color:#0a66c2;cursor:pointer;text-decoration:underline}
-  #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);place-items:center;z-index:10}
+  :root{--bg:#f6f7f9;--card:#fff;--ink:#1d2330;--muted:#5b6475;--accent:#0a66c2;--line:#e3e6ec}
+  @media (prefers-color-scheme:dark){:root{--bg:#14171c;--card:#1e232b;--ink:#eef1f5;--muted:#9aa4b2;--accent:#5aa9ff;--line:#2c333d}}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;background:var(--bg);color:var(--ink)}
+  main{max-width:960px;margin:0 auto;padding:28px 16px 40px}
+  h1{font-size:1.6rem;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 22px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;list-style:none;margin:0;padding:0}
+  .card{display:flex;flex-direction:column;width:100%;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--card);color:inherit;font:inherit;text-align:left;cursor:pointer;overflow:hidden;transition:transform .15s,box-shadow .15s}
+  .card:hover,.card:focus-visible{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12);outline:none}
+  .card:focus-visible{border-color:var(--accent)}
+  .thumb{aspect-ratio:1600/560;width:100%;background:#0d1117 center/cover no-repeat;display:grid;place-items:center}
+  .thumb span{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.95);display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .thumb.con-portada{place-items:end end}.thumb.con-portada span{margin:8px}
+  .thumb span::before{content:"";margin-left:4px;border-style:solid;border-width:8px 0 8px 13px;border-color:transparent transparent transparent #1d2330}
+  .name{padding:12px 14px;font-weight:600}
+  #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);place-items:center;z-index:10;padding:16px}
   #modal.open{display:grid}
-  #box{position:relative;width:min(90vw,900px)}
-  video{width:100%;border-radius:8px;background:#000}
-  #close{position:absolute;top:-36px;right:0;background:none;border:0;color:#fff;font-size:2rem;cursor:pointer}
+  #box{position:relative;width:min(92vw,960px)}
+  #box h2{color:#fff;font-size:1rem;font-weight:600;margin:0 40px 10px 0}
+  video{width:100%;max-height:80vh;border-radius:8px;background:#000;display:block}
+  #close{position:absolute;top:-6px;right:0;background:none;border:0;color:#fff;font-size:2rem;line-height:1;cursor:pointer}
+  @media (prefers-reduced-motion:reduce){.card{transition:none}}
 </style>
 </head>
 <body>
-  <a id="open">▶ Ver video</a>
+<main>
+  <h1>Manuales de uso</h1>
+  <p class="sub">Toca un manual para verlo.</p>
+  <ul class="grid" id="list"></ul>
+</main>
 
-  <div id="modal">
-    <div id="box">
-      <button id="close" aria-label="Cerrar">&times;</button>
-      <video id="player" src="MANUALES-DE-USO/TIK_TOK_MANUAL_USO.mp4" controls playsinline></video>
-    </div>
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="vtitle">
+  <div id="box">
+    <h2 id="vtitle"></h2>
+    <button id="close" aria-label="Cerrar">&times;</button>
+    <video id="player" controls playsinline preload="none"></video>
   </div>
+</div>
 
 <script>
+  // Para agregar un manual: súmalo aquí. "id" es el nombre corto del enlace directo
+  // (por ejemplo index.html?v=tiktok abre y reproduce ese manual).
+  const MANUALES = [
+    { id: 'tiktok', nombre: 'TikTok', video: 'MANUALES-DE-USO/TIK_TOK_MANUAL_USO.mp4', portada: 'portadas/TikTok_cobranza.png' },
+    { id: 'gmf', nombre: 'GMF', video: 'MANUALES-DE-USO/MANUAL-GMF.mp4', portada: 'portadas/GMF_cobranza.png' },
+    { id: 'inter', nombre: 'Inter', video: 'MANUALES-DE-USO/MANUAL-INTER.mp4', portada: 'portadas/Inter_ATC.png' },
+    { id: 'presentacion-inter', nombre: 'Presentación Inter', video: 'MANUALES-DE-USO/PRESENTACION_INTER.mp4' },
+    { id: 'cobranza', nombre: 'Cobranza', video: 'MANUALES-DE-USO/MANUAL COBRANZA.mp4' },
+    { id: 'total-play', nombre: 'Total Play', video: 'MANUALES-DE-USO/MANUAL-TOTAL-PLAY.mp4' },
+    { id: 'binatsa', nombre: 'Binatsa', video: 'MANUALES-DE-USO/BINATSA.mp4' },
+  ];
+
+  const list = document.getElementById('list');
   const modal = document.getElementById('modal');
   const player = document.getElementById('player');
-  document.getElementById('open').onclick = () => { modal.classList.add('open'); player.play(); };
-  const close = () => { player.pause(); player.currentTime = 0; modal.classList.remove('open'); };
-  document.getElementById('close').onclick = close;
-  modal.onclick = e => { if (e.target === modal) close(); };
-  // Abre y reproduce solo al cargar; si el navegador bloquea el audio, arranca en silencio
-  function autoplay() {
+  const title = document.getElementById('vtitle');
+  let lastFocus = null;
+
+  for (const m of MANUALES) {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.className = 'card';
+    b.type = 'button';
+    const thumb = document.createElement('div');
+    thumb.className = 'thumb';
+    if (m.portada) { thumb.style.backgroundImage = 'url("' + encodeURI(m.portada) + '")'; thumb.classList.add('con-portada'); }
+    thumb.innerHTML = '<span aria-hidden="true"></span>';
+    const name = document.createElement('div');
+    name.className = 'name';
+    name.textContent = m.nombre;
+    b.append(thumb, name);
+    b.setAttribute('aria-label', 'Ver manual ' + m.nombre);
+    b.onclick = () => open(m);
+    li.append(b);
+    list.append(li);
+  }
+
+  function open(m) {
+    lastFocus = document.activeElement;
+    title.textContent = 'Manual ' + m.nombre;
+    player.src = encodeURI(m.video);
     modal.classList.add('open');
+    document.getElementById('close').focus();
+    // Si el navegador bloquea el audio al reproducir solo, arranca en silencio.
     player.play().catch(() => { player.muted = true; player.play().catch(() => {}); });
   }
-  window.addEventListener('load', autoplay);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  function close() {
+    player.pause();
+    player.removeAttribute('src');
+    player.load();
+    player.muted = false;
+    modal.classList.remove('open');
+    if (lastFocus) lastFocus.focus();
+  }
+  document.getElementById('close').onclick = close;
+  modal.onclick = (e) => { if (e.target === modal) close(); };
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) close(); });
+
+  // Enlace directo: ?v=tiktok (o #tiktok) abre ese manual al cargar.
+  const pedido = (new URLSearchParams(location.search).get('v') || location.hash.slice(1)).toLowerCase();
+  const inicial = MANUALES.find((m) => m.id === pedido);
+  if (inicial) window.addEventListener('load', () => open(inicial));
 </script>
 </body>
 </html>
