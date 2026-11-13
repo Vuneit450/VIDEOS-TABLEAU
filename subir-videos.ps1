@@ -24,7 +24,24 @@ $Carpeta   = Join-Path $env:TEMP "videos-tableau"
 $Descargas = Join-Path $env:USERPROFILE "Downloads"
 $PortadaGenerica = "portadas/Binatsa_tableau.png"   # para videos nuevos sin portada propia (se cambia después)
 
-if (-not (Get-Command git -ErrorAction SilentlyContinue)) { Write-Host "Falta Git: https://git-scm.com/download/win"; return }
+# 0. Git: si la PC no lo tiene, se instala solo (con winget o con el instalador oficial de Git para Windows)
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+  Write-Host "Esta PC no tiene Git; lo instalo (puede pedir permiso de administrador)..."
+  try {
+    if (Get-Command winget -ErrorAction SilentlyContinue) {
+      winget install --id Git.Git -e --silent --accept-package-agreements --accept-source-agreements
+    } else {
+      $rel = Invoke-RestMethod "https://api.github.com/repos/git-for-windows/git/releases/latest"
+      $inst = $rel.assets | Where-Object { $_.name -match '^Git-.*-64-bit\.exe$' } | Select-Object -First 1
+      $exe = Join-Path $env:TEMP $inst.name
+      Invoke-WebRequest $inst.browser_download_url -OutFile $exe -UseBasicParsing
+      Start-Process $exe -ArgumentList '/VERYSILENT', '/NORESTART' -Wait
+    }
+  } catch { Write-Host "No pude instalar Git solo: $($_.Exception.Message)" }
+  $env:Path += ";$env:ProgramFiles\Git\cmd;$env:LOCALAPPDATA\Programs\Git\cmd"
+  if (-not (Get-Command git -ErrorAction SilentlyContinue)) { Write-Host "Instala Git desde https://git-scm.com/download/win y vuelve a correr la línea."; return }
+  Write-Host "Git instalado."
+}
 
 # 1. Leer la lista y revisar cada archivo en Descargas
 $Plan = @()
