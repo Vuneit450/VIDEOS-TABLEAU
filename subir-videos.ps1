@@ -95,10 +95,18 @@ git add MANUALES-DE-USO index.html
 git status --short
 git commit -m "Manuales en video: $(($Plan | ForEach-Object { $_.Destino }) -join ', ')"
 if ($LASTEXITCODE -ne 0) { Pop-Location; Write-Host "No hubo cambios: los archivos son iguales a los publicados."; return }
-git push origin main
-$ok = $LASTEXITCODE
+# Si alguien subió algo mientras tanto (otro hilo u otra PC), se trae lo nuevo y se reintenta
+$ok = 1
+foreach ($intento in 1..4) {
+  git push origin main
+  $ok = $LASTEXITCODE
+  if ($ok -eq 0) { break }
+  Write-Host "El repo cambió mientras tanto; traigo lo nuevo y reintento ($intento de 4)..."
+  git pull --rebase --depth 50 origin main
+  Start-Sleep -Seconds (2 * $intento)
+}
 Pop-Location
-if ($ok -ne 0) { Write-Host "El push falló. Revisa que hayas iniciado sesión como Vuneit450."; return }
+if ($ok -ne 0) { Write-Host "El push falló. Revisa que hayas iniciado sesión como Vuneit450 y vuelve a correr la línea."; return }
 
 # 5. Comprobar los links (GitHub Pages tarda 1-2 min)
 Write-Host ""
