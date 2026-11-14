@@ -1,19 +1,21 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Manuales de uso</title>
+<title>BINATSA · Videos</title>
 <style>
-  :root{--bg:#f6f7f9;--card:#fff;--ink:#1d2330;--muted:#5b6475;--accent:#0a66c2;--line:#e3e6ec}
-  @media (prefers-color-scheme:dark){:root{--bg:#14171c;--card:#1e232b;--ink:#eef1f5;--muted:#9aa4b2;--accent:#5aa9ff;--line:#2c333d}}
+  /* Videos de BINATSA: manuales de tableros (uno por cliente: MANUAL-<CLIENTE>.mp4) y videos de BINATSA (BINATSA-*.mp4). */
+  :root{--bg:#fff;--card:#f4f6f7;--ink:#2b3238;--muted:#5f6b75;--accent:#0e5a78;--line:#dfe4e8;color-scheme:light}
   *{box-sizing:border-box}
-  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;background:var(--bg);color:var(--ink)}
-  main{max-width:960px;margin:0 auto;padding:28px 16px 40px}
-  h1{font-size:1.6rem;margin:0 0 4px}
-  .sub{color:var(--muted);margin:0 0 22px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;list-style:none;margin:0;padding:0}
-  .card{display:flex;flex-direction:column;width:100%;padding:0;border:1px solid var(--line);border-radius:12px;background:var(--card);color:inherit;font:inherit;text-align:left;cursor:pointer;overflow:hidden;transition:transform .15s,box-shadow .15s}
+  body{font-family:"Segoe UI",Roboto,Arial,sans-serif;margin:0;background:var(--bg);color:var(--ink)}
+  main{max-width:1100px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-left,0px)) 40px max(16px,env(safe-area-inset-right,0px))}
+  header{border-bottom:3px solid var(--accent);padding-bottom:12px;margin-bottom:8px}
+  h1{font-size:1.6rem;font-weight:500;color:var(--accent);margin:0 0 4px}
+  h2.seccion{font-size:1.05rem;font-weight:600;color:#fff;background:var(--accent);padding:8px 12px;margin:24px 0 12px}
+  .sub{color:var(--muted);margin:0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;list-style:none;margin:0;padding:0}
+  .card{display:flex;flex-direction:column;width:100%;padding:0;border:1px solid var(--line);background:var(--card);color:inherit;font:inherit;text-align:left;cursor:pointer;overflow:hidden;transition:transform .15s,box-shadow .15s}
   .card:hover,.card:focus-visible{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12);outline:none}
   .card:focus-visible{border-color:var(--accent)}
   .thumb{aspect-ratio:1600/560;width:100%;background:#0d1117 center/cover no-repeat;display:grid;place-items:center}
@@ -32,9 +34,11 @@
 </head>
 <body>
 <main>
-  <h1>Manuales de uso</h1>
-  <p class="sub">Toca un manual para verlo.</p>
+  <header><h1>BINATSA · Videos</h1><p class="sub">Toca un video para verlo.</p></header>
+  <h2 class="seccion">Manuales de uso de los tableros</h2>
   <ul class="grid" id="list"></ul>
+  <h2 class="seccion">BINATSA</h2>
+  <ul class="grid" id="list-binatsa"></ul>
 </main>
 
 <div id="modal" role="dialog" aria-modal="true" aria-labelledby="vtitle">
@@ -48,19 +52,19 @@
 <script>
   // Para agregar un manual: súmalo aquí. "id" es el nombre corto del enlace directo
   // (por ejemplo index.html?v=tiktok abre y reproduce ese manual).
+  // Formato de nombres: manuales MANUAL-<CLIENTE>.mp4 con portada portadas/MANUAL-<CLIENTE>.png;
+  // videos de la marca BINATSA-<TEMA>.mp4 (tipo: 'binatsa'). Una línea por video.
   const MANUALES = [
-    { id: 'tiktok', nombre: 'TikTok', video: 'MANUALES-DE-USO/TIK_TOK_MANUAL_USO.mp4', portada: 'portadas/TikTok_cobranza.png' },
-    { id: 'gmf', nombre: 'GMF', video: 'MANUALES-DE-USO/MANUAL-GMF.mp4', portada: 'portadas/GMF_cobranza.png' },
-    { id: 'inter', nombre: 'Inter', video: 'MANUALES-DE-USO/MANUAL-INTER.mp4', portada: 'portadas/Inter_ATC.png' },
-    { id: 'presentacion-inter', nombre: 'Presentación Inter', video: 'MANUALES-DE-USO/PRESENTACION_INTER.mp4', portada: 'portadas/Inter_presentacion.png' },
-    { id: 'cobranza', nombre: 'Cobranza', video: 'MANUALES-DE-USO/MANUAL COBRANZA.mp4', portada: 'portadas/Cobranza_union.png' },
-    { id: 'total-play', nombre: 'Total Play', video: 'MANUALES-DE-USO/MANUAL-TOTAL-PLAY.mp4', portada: 'portadas/TotalPlay_cobranza.png' },
-    { id: 'binatsa', nombre: 'Binatsa', video: 'MANUALES-DE-USO/BINATSA.mp4', portada: 'portadas/Binatsa_tableau.png' },
-    { id: 'manual-demo-atc', nombre: 'Demo ATC', video: 'MANUALES-DE-USO/MANUAL-DEMO-ATC.mp4', portada: 'portadas/Demo_ATC.png' },
-    { id: 'binatsa-conoce-al-equipo', nombre: 'BINATSA CONOCE AL EQUIPO', video: 'MANUALES-DE-USO/BINATSA-CONOCE-AL-EQUIPO.mp4', portada: 'portadas/Binatsa_tableau.png' },
+    { id: 'gmf', nombre: 'GMF', video: 'MANUALES-DE-USO/MANUAL-GMF.mp4', portada: 'portadas/MANUAL-GMF.png' },
+    { id: 'inter', nombre: 'Inter', video: 'MANUALES-DE-USO/MANUAL-INTER.mp4', portada: 'portadas/MANUAL-INTER.png' },
+    { id: 'tiktok', nombre: 'TikTok', video: 'MANUALES-DE-USO/MANUAL-TIKTOK.mp4', portada: 'portadas/MANUAL-TIKTOK.png' },
+    { id: 'cobranza', nombre: 'Cobranza unificado', video: 'MANUALES-DE-USO/MANUAL-COBRANZA.mp4', portada: 'portadas/MANUAL-COBRANZA.png' },
+    { id: 'total-play', nombre: 'Total Play', video: 'MANUALES-DE-USO/MANUAL-TOTAL-PLAY.mp4', portada: 'portadas/MANUAL-TOTAL-PLAY.png' },
+    { id: 'binatsa', nombre: 'BINATSA', video: 'MANUALES-DE-USO/BINATSA.mp4', portada: 'portadas/BINATSA.png', tipo: 'binatsa' },
+    { id: 'binatsa-conoce-al-equipo', nombre: 'Conoce al equipo', video: 'MANUALES-DE-USO/BINATSA-CONOCE-AL-EQUIPO.mp4', portada: 'portadas/BINATSA.png', tipo: 'binatsa' },
   ];
 
-  const list = document.getElementById('list');
+  const list = document.getElementById('list'), listB = document.getElementById('list-binatsa');
   const modal = document.getElementById('modal');
   const player = document.getElementById('player');
   const title = document.getElementById('vtitle');
@@ -79,15 +83,15 @@
     name.className = 'name';
     name.textContent = m.nombre;
     b.append(thumb, name);
-    b.setAttribute('aria-label', 'Ver manual ' + m.nombre);
+    b.setAttribute('aria-label', (m.tipo === 'binatsa' ? 'Ver video ' : 'Ver manual ') + m.nombre);
     b.onclick = () => open(m);
     li.append(b);
-    list.append(li);
+    (m.tipo === 'binatsa' ? listB : list).append(li);
   }
 
   function open(m) {
     lastFocus = document.activeElement;
-    title.textContent = 'Manual ' + m.nombre;
+    title.textContent = (m.tipo === 'binatsa' ? 'BINATSA · ' : 'Manual ') + m.nombre;
     player.src = encodeURI(m.video);
     modal.classList.add('open');
     document.getElementById('close').focus();

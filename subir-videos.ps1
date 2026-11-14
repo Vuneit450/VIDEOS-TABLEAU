@@ -22,7 +22,7 @@ $Autor     = "Jonathan Frias"
 $Correo    = "Vuneit450@users.noreply.github.com"                          # correo privado de GitHub de Vuneit450
 $Carpeta   = Join-Path $env:TEMP "videos-tableau"
 $Descargas = Join-Path $env:USERPROFILE "Downloads"
-$PortadaGenerica = "portadas/Binatsa_tableau.png"   # para videos nuevos sin portada propia (se cambia después)
+$PortadaGenerica = "portadas/BINATSA.png"   # para videos nuevos sin portada propia (se cambia después)
 
 # 0. Git: si la PC no lo tiene, se instala solo (con winget o con el instalador oficial de Git para Windows)
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
