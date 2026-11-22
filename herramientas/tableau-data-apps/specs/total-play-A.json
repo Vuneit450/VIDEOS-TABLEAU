@@ -1,0 +1,38 @@
+{
+ "apps": [
+  {
+   "id": "com.binatsa.viz",
+   "name": "Binatsa Viz",
+   "content_dir": "herramientas/tableau-data-apps/viz"
+  }
+ ],
+ "sheets": [
+  {
+   "from": "TP D · Embudo de cuentas",
+   "sheet": "X Sankey · Embudo de la cartera",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Dirección",
+   "replace_zone": "TP D · Embudo de cuentas"
+  },
+  {
+   "from": "TP S · Agentes",
+   "sheet": "X Enjambre · Adherencia por agente",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Operación",
+   "replace_zone": "TP O · Adherencia por agente",
+   "title_from": "TP O · Adherencia por agente",
+   "title_replace": [
+    [
+     "10 agentes con menor adherencia",
+     "Adherencia de todos los agentes"
+    ],
+    [
+     "¿Quién no está cumpliendo su horario de conexión?",
+     "Cada punto es un agente; rojo = bajo la meta de 80%"
+    ]
+   ]
+  }
+ ]
+}

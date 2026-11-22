@@ -1,0 +1,35 @@
+{
+ "apps": [
+  {
+   "id": "com.binatsa.viz",
+   "name": "Binatsa Viz",
+   "content_dir": "herramientas/tableau-data-apps/viz"
+  }
+ ],
+ "sheets": [
+  {
+   "from": "Embudo de casos",
+   "sheet": "X Sankey · Embudo de casos",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Dirección",
+   "replace_zone": "Embudo de casos"
+  },
+  {
+   "from": "Embudo de llamadas",
+   "sheet": "X Sankey · Embudo de llamadas",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Operación",
+   "replace_zone": "Embudo de llamadas"
+  },
+  {
+   "from": "Asesores dispersión",
+   "sheet": "X Dispersion · Esfuerzo o resultado",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Operación",
+   "replace_zone": "Asesores dispersión"
+  }
+ ]
+}

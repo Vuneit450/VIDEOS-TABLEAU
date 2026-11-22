@@ -1,0 +1,103 @@
+{
+ "apps": [
+  {
+   "id": "com.binatsa.viz",
+   "name": "Binatsa Viz",
+   "content_dir": "herramientas/tableau-data-apps/viz"
+  }
+ ],
+ "sheets": [
+  {
+   "from": "TP D · Embudo de cuentas",
+   "sheet": "X Sankey · Embudo de la cartera",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Dirección",
+   "replace_zone": "TP D · Embudo de cuentas"
+  },
+  {
+   "from": "TP S · Estado por segmento",
+   "sheet": "X Sol · Cartera por segmento y estado",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Dirección",
+   "replace_zone": "TP D · Cuentas por segmento",
+   "title_from": "TP D · Cuentas por segmento",
+   "title_replace": [
+    [
+     "Cuentas asignadas por segmento",
+     "Cartera por segmento y estado"
+    ],
+    [
+     "¿En qué tramo de mora está la cartera?",
+     "Anillo interior: segmento · exterior: sigue en gestión o retirada"
+    ]
+   ]
+  },
+  {
+   "from": "TP D · Estatus de promesas",
+   "sheet": "X Waffle · Estatus de las promesas",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Dirección",
+   "replace_zone": "TP D · Estatus de promesas"
+  },
+  {
+   "from": "TP O · Mapa de calor",
+   "sheet": "X Calor · Mapa de calor",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Operación",
+   "replace_zone": "TP O · Mapa de calor"
+  },
+  {
+   "from": "TP S · Agentes",
+   "sheet": "X Enjambre · Adherencia por agente",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Operación",
+   "replace_zone": "TP O · Adherencia por agente",
+   "title_from": "TP O · Adherencia por agente",
+   "title_replace": [
+    [
+     "10 agentes con menor adherencia",
+     "Adherencia de todos los agentes"
+    ],
+    [
+     "¿Quién no está cumpliendo su horario de conexión?",
+     "Cada punto es un agente; rojo = bajo la meta de 80%"
+    ]
+   ]
+  },
+  {
+   "from": "TP O · Hora de entrada",
+   "sheet": "X Puntualidad · Hora de entrada",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Operación",
+   "replace_zone": "TP O · Hora de entrada"
+  },
+  {
+   "from": "TP S · Adherencia diaria por turno",
+   "sheet": "X Calor · Adherencia diaria por turno",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Seguimiento",
+   "replace_zone": "TP S · Adherencia diaria por turno"
+  },
+  {
+   "from": "TP S · Agentes",
+   "sheet": "X Cuadrantes · Agentes",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Seguimiento",
+   "replace_zone": "TP S · Agentes",
+   "title_replace": [
+    [
+     "Agentes: turno, puntualidad y adherencia",
+     "Agentes: puntualidad vs adherencia"
+    ]
+   ]
+  }
+ ]
+}

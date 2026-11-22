@@ -1,0 +1,87 @@
+{
+ "apps": [
+  {
+   "id": "com.binatsa.viz",
+   "name": "Binatsa Viz",
+   "content_dir": "herramientas/tableau-data-apps/viz"
+  }
+ ],
+ "sheets": [
+  {
+   "from": "Embudo de casos",
+   "sheet": "X Sankey · Embudo de casos",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Dirección",
+   "replace_zone": "Embudo de casos"
+  },
+  {
+   "from": "Embudo de llamadas",
+   "sheet": "X Sankey · Embudo de llamadas",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Operación",
+   "replace_zone": "Embudo de llamadas"
+  },
+  {
+   "from": "Asesores dispersión",
+   "sheet": "X Dispersion · Esfuerzo o resultado",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Operación",
+   "replace_zone": "Asesores dispersión"
+  },
+  {
+   "from": "Mapa de calor hora",
+   "sheet": "X Calor · Horas de contacto",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Operación",
+   "replace_zone": "Mapa de calor hora"
+  },
+  {
+   "from": "Cumplimiento por día",
+   "sheet": "X Calor · Cumplimiento por día",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Seguimiento",
+   "replace_zone": "Cumplimiento por día"
+  },
+  {
+   "from": "Comité · Semáforo asesor por día",
+   "sheet": "X Calor · Semáforo asesor por día",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Comité",
+   "replace_zone": "Comité · Semáforo asesor por día"
+  },
+  {
+   "from": "Comité · Eficiencia por asesor",
+   "sheet": "X Dispersion · Eficiencia por asesor",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Comité",
+   "replace_zone": "Comité · Eficiencia por asesor"
+  },
+  {
+   "from": "Comité · Pago por hora trabajada",
+   "sheet": "X Enjambre · Pago por hora trabajada",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Comité · Desempeño",
+   "replace_zone": "Comité · Pago por hora trabajada"
+  },
+  {
+   "from": "Comité · Ranking de recuperación por asesor",
+   "sheet": "X Enjambre · Ranking de recuperación",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "Comité · Desempeño",
+   "replace_zone": "Comité · Ranking de recuperación por asesor"
+  }
+ ],
+ "fix_size": [
+  "Comité",
+  "Comité · Desempeño"
+ ]
+}
