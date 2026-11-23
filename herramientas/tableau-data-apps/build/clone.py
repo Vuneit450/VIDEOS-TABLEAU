@@ -72,6 +72,12 @@ for sh in spec['sheets']:
         m = pat.search(raw); assert m, sh['dashboard']
         seg = m.group(0).replace(f"name='{esc(sh['replace_zone'])}'", f"name='{esc(sh['sheet'])}'")
         raw = raw[:m.start()] + seg + raw[m.end():]
+# Quita selecciones de acciones guardadas al publicar (equivale a limpiar el clic; la acción sigue viva)
+for an in spec.get('clear_action_filters', []):
+    col = re.escape('[' + an + ']')
+    raw, k = re.subn(r"\s*<filter class='categorical' column='[^']*" + col + r"'>.*?</filter>", '', raw, flags=re.S)
+    raw = re.sub(r"\s*<column>[^<]*" + col + r"</column>", '', raw)
+    print('acción limpiada', an, k, 'hojas')
 for o, n in spec.get('raw_replace', []):
     assert o in raw, 'raw_replace sin coincidencia: ' + o
     raw = raw.replace(o, n)

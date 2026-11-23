@@ -62,6 +62,11 @@ Spec mínimo:
 
 Para agregar un visual: crea `CHARTS.nuevo = function (root, d) {…}` en `charts.js`. `d` trae `{cols, rows, dims}`, y cada fila trae el valor nativo y `campo__f` (texto formateado). Usa `V.svg`, `V.tip` y `V.fmt` de `core.js`.
 
+## Auditoría de datos (hacer siempre)
+
+- **Clics guardados:** si el libro se publicó con una selección activa, las hojas que reciben esa acción quedan filtradas para todos. Busca en el `.twb` `<filter ... column='...[Action (...)]'>` con `member=`. Se limpia en la copia con `clear_action_filters` en el spec.
+- **Antes de llamar error a dos cifras distintas, revisa unidad y fecha base** (p. ej. *cuentas* con pago por fecha de asignación contra *pagos* por fecha de pago). Los títulos deben decir qué cuentan.
+
 ## Reglas de diseño (revisión experta, 23/11/2026)
 
 - **Sankey solo si las etapas están anidadas** (cada una ≤ la anterior). Si no, el visual cambia solo a barras (TIK TOK: 711 promesas > 326 contactos clave).

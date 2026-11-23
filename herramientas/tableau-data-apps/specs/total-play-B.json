@@ -90,5 +90,8 @@
    "&quot;- vs 7 días previos&quot;",
    "&quot;&quot;"
   ]
+ ],
+ "clear_action_filters": [
+  "Action (Rango de entrada)"
  ]
 }
