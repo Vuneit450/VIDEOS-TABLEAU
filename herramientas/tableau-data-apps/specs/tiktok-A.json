@@ -31,5 +31,15 @@
    "dashboard": "Operación",
    "replace_zone": "Asesores dispersión"
   }
+ ],
+ "raw_replace": [
+  [
+   "¿Qué canal recupera más cada día?",
+   "¿Qué canal rinde más cada día? (según el KPI elegido)"
+  ],
+  [
+   "¿Cuánto aporta cada canal?",
+   "¿Cuánto monto prometido aporta cada canal?"
+  ]
  ]
 }

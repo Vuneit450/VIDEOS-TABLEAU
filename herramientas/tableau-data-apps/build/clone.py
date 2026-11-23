@@ -72,6 +72,9 @@ for sh in spec['sheets']:
         m = pat.search(raw); assert m, sh['dashboard']
         seg = m.group(0).replace(f"name='{esc(sh['replace_zone'])}'", f"name='{esc(sh['sheet'])}'")
         raw = raw[:m.start()] + seg + raw[m.end():]
+for o, n in spec.get('raw_replace', []):
+    assert o in raw, 'raw_replace sin coincidencia: ' + o
+    raw = raw.replace(o, n)
 for dn in spec.get('fix_size', []):
     pat = re.compile(r"(<dashboard [^>]*name='" + re.escape(esc(dn)) + r"'>.*?)<size maxheight='(\d+)' maxwidth='(\d+)'[^/]*/>", re.S)
     raw = pat.sub(lambda m: m.group(1) + f"<size maxheight='{m.group(2)}' maxwidth='{m.group(3)}' minheight='{m.group(2)}' minwidth='{m.group(3)}' sizing-mode='fixed' />", raw, count=1)

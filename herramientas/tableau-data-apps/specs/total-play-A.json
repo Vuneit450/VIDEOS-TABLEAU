@@ -34,5 +34,15 @@
     ]
    ]
   }
+ ],
+ "raw_replace": [
+  [
+   "&quot;- vs periodo previo&quot;",
+   "&quot;&quot;"
+  ],
+  [
+   "&quot;- vs 7 días previos&quot;",
+   "&quot;&quot;"
+  ]
  ]
 }

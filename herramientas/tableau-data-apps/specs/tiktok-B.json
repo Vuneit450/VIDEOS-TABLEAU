@@ -65,7 +65,7 @@
   },
   {
    "from": "Comité · Pago por hora trabajada",
-   "sheet": "X Enjambre · Pago por hora trabajada",
+   "sheet": "X Ranking · Pago por hora trabajada",
    "app": "com.binatsa.viz",
    "hidden": true,
    "dashboard": "Comité · Desempeño",
@@ -73,7 +73,7 @@
   },
   {
    "from": "Comité · Ranking de recuperación por asesor",
-   "sheet": "X Enjambre · Ranking de recuperación",
+   "sheet": "X Ranking · Recuperación por asesor",
    "app": "com.binatsa.viz",
    "hidden": true,
    "dashboard": "Comité · Desempeño",
@@ -83,5 +83,15 @@
  "fix_size": [
   "Comité",
   "Comité · Desempeño"
+ ],
+ "raw_replace": [
+  [
+   "¿Qué canal recupera más cada día?",
+   "¿Qué canal rinde más cada día? (según el KPI elegido)"
+  ],
+  [
+   "¿Cuánto aporta cada canal?",
+   "¿Cuánto monto prometido aporta cada canal?"
+  ]
  ]
 }

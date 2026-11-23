@@ -62,6 +62,16 @@ Spec mínimo:
 
 Para agregar un visual: crea `CHARTS.nuevo = function (root, d) {…}` en `charts.js`. `d` trae `{cols, rows, dims}`, y cada fila trae el valor nativo y `campo__f` (texto formateado). Usa `V.svg`, `V.tip` y `V.fmt` de `core.js`.
 
+## Reglas de diseño (revisión experta, 23/11/2026)
+
+- **Sankey solo si las etapas están anidadas** (cada una ≤ la anterior). Si no, el visual cambia solo a barras (TIK TOK: 711 promesas > 326 contactos clave).
+- **Sunburst no.** Con segmentos chicos (27 cuentas) desaparecen; las barras apiladas lo dicen mejor.
+- **Enjambre solo con muchos agentes (30+).** Con menos, usa `Ranking` (con nombres, mediana y tope para atípicos).
+- **Calor:** solo columnas con datos; celda punteada = sin dato, distinta de 0.
+- **Dispersión:** títulos en ambos ejes y nombres solo en extremos y en el cuadrante de alerta, sin solapes.
+- **Tarjetas KPI:** si no hay comparativo, no mostrar "- vs periodo previo" (`raw_replace` en el spec vacía el texto).
+- **Título = métrica:** si el gráfico muestra monto prometido, el título no dice "recupera".
+
 ## Proceso
 
 1. **Auditar.** Lista los dashboards y sus zonas (regex sobre el `.twb`) y toma imagen de cada dashboard del original con `shot.py`. Por vista anota la pregunta que responde, la audiencia y las visitas (más visitas = más prioridad).

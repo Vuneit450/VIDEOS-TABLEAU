@@ -16,25 +16,6 @@
    "replace_zone": "TP D · Embudo de cuentas"
   },
   {
-   "from": "TP S · Estado por segmento",
-   "sheet": "X Sol · Cartera por segmento y estado",
-   "app": "com.binatsa.viz",
-   "hidden": true,
-   "dashboard": "Dirección",
-   "replace_zone": "TP D · Cuentas por segmento",
-   "title_from": "TP D · Cuentas por segmento",
-   "title_replace": [
-    [
-     "Cuentas asignadas por segmento",
-     "Cartera por segmento y estado"
-    ],
-    [
-     "¿En qué tramo de mora está la cartera?",
-     "Anillo interior: segmento · exterior: sigue en gestión o retirada"
-    ]
-   ]
-  },
-  {
    "from": "TP D · Estatus de promesas",
    "sheet": "X Waffle · Estatus de las promesas",
    "app": "com.binatsa.viz",
@@ -99,5 +80,15 @@
     ]
    ]
   }
+ ],
+ "raw_replace": [
+  [
+   "&quot;- vs periodo previo&quot;",
+   "&quot;&quot;"
+  ],
+  [
+   "&quot;- vs 7 días previos&quot;",
+   "&quot;&quot;"
+  ]
  ]
 }

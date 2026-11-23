@@ -16,6 +16,8 @@ var CHARTS = (function () {
       agg[k].v += V.num(r[vcol]) || 0;
     });
     var st = Object.keys(agg).map(function (k) { return agg[k]; }).sort(function (a, b) { return a.ord - b.ord; });
+    // Si alguna etapa es mayor que la anterior no es un embudo: un Sankey mentiría. Se dibujan barras.
+    if (st.some(function (o, i) { return i > 0 && o.v > st[i - 1].v; })) return etapasBarras(root, st);
     var g = V.svg(root), s = g.s, W = g.w, H = g.h;
     if (!st.length || !st[0].v) { txt(s, 12, 24, 'Sin datos para los filtros elegidos', { fill: C.mute }); return; }
     var n = st.length, padL = 8, padR = 8, top = 34, bot = 18;
@@ -60,6 +62,21 @@ var CHARTS = (function () {
       { 'text-anchor': 'end', 'font-size': 10.5, fill: C.red });
   }
 
+  // Barras por etapa (respaldo del Sankey cuando las etapas no están anidadas)
+  function etapasBarras(root, st) {
+    var g = V.svg(root), s = g.s, W = g.w, H = g.h, L = 130, R = 70, T = 8, B = 22;
+    var mx = Math.max.apply(null, st.map(function (o) { return o.v; })) || 1, bh = Math.min(34, (H - T - B) / st.length - 8);
+    st.forEach(function (o, i) {
+      var y = T + i * ((H - T - B) / st.length), w = Math.max(2, Math.sqrt(o.v / mx) * (W - L - R));
+      txt(s, L - 8, y + bh / 2 + 4, o.label, { 'text-anchor': 'end', 'font-size': 11 });
+      var r = el('rect', { x: L, y: y, width: w, height: bh, rx: 2, fill: C.navy }, s);
+      V.tip(r, [o.label, fmt.n(o.v)]);
+      var rel = i > 0 ? ' (' + (o.v / st[i - 1].v > 1 ? '×' + (o.v / st[i - 1].v).toFixed(1) : fmt.p(o.v / st[i - 1].v)) + ' vs etapa anterior)' : '';
+      txt(s, L + w + 6, y + bh / 2 + 4, fmt.n(o.v) + rel, { 'font-size': 11, fill: C.ink });
+    });
+    txt(s, L, H - 4, 'Escala raíz cuadrada para que se vean las etapas chicas · las etapas no están anidadas, por eso no es un embudo', { 'font-size': 9.5, fill: C.mute });
+  }
+
   // ---- ENJAMBRE (BEESWARM) ------------------------------------------------------------
   // Datos: agentes con Turno, Adherencia, Jornadas, Retraso. Una bolita por agente, una fila por turno.
   function enjambre(root, d) {
@@ -74,7 +91,7 @@ var CHARTS = (function () {
     var g = V.svg(root), s = g.s, W = g.w, H = g.h;
     if (!pts.length) { txt(s, 12, 24, 'Sin agentes para los filtros elegidos', { fill: C.mute }); return; }
     var turns = Array.from(new Set(pts.map(function (p) { return p.t; }))).sort();
-    var L = 86, R = 16, T = 22, B = 30, META = 0.8;
+    var L = 130, R = 16, T = 22, B = 30, META = 0.8;
     var x = function (v) { return L + Math.max(0, Math.min(1, v)) * (W - L - R); };
     var band = (H - T - B) / turns.length;
     var maxJ = Math.max.apply(null, pts.map(function (p) { return p.j; }));
@@ -231,6 +248,7 @@ CHARTS.calor = function (root, d) {
   var dow = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
   rk.sort(function (a, b) { var i = dow.indexOf(a), j = dow.indexOf(b); return i >= 0 && j >= 0 ? i - j : String(a).localeCompare(b); });
   ck.sort(function (a, b) { var x = parseFloat(a), y = parseFloat(b); return !isNaN(x) && !isNaN(y) && !/-/.test(a) ? x - y : a < b ? -1 : a > b ? 1 : 0; });
+  ck = ck.filter(function (c) { return rk.some(function (r) { return M[r + '|' + c] != null; }); });
   var vals = Object.keys(M).map(function (k) { return M[k]; }).filter(function (v) { return v != null; });
   var lo = pct ? Math.min.apply(null, vals) : 0, hi = Math.max.apply(null, vals);
   var g = V.svg(root), s = g.s, W = g.w, H = g.h;
@@ -238,7 +256,7 @@ CHARTS.calor = function (root, d) {
   var L = Math.min(210, Math.max(50, Math.max.apply(null, rk.map(function (r) { return String(r).length; })) * 6.2 + 12)), T = 22, R = 56, B = 26;
   var cw = (W - L - R) / ck.length, ch = Math.min(34, (H - T - B) / rk.length);
   function color(v) {
-    if (v == null) return '#F3F5F8';
+    if (v == null) return '#fff';
     var t = (v - lo) / ((hi - lo) || 1);
     if (pct) { // divergente: rojo (bajo) → blanco → azul (alto)
       var m = /Cumplimiento/i.test(valC) ? 0.7 : 0.8; var u = v < m ? (v - lo) / ((m - lo) || 1) : 1 + (v - m) / ((hi - m) || 1);
@@ -264,14 +282,14 @@ CHARTS.calor = function (root, d) {
     ck.forEach(function (c, j) {
       var v = M[r + '|' + c];
       if (v != null) { rowTot += v; n++; }
-      var rect = el('rect', { x: L + j * cw + 1, y: y + 1, width: Math.max(1, cw - 2), height: ch - 2, rx: 2, fill: color(v) }, s);
+      var rect = el('rect', { x: L + j * cw + 1, y: y + 1, width: Math.max(1, cw - 2), height: ch - 2, rx: 2, fill: v == null ? '#fff' : color(v), stroke: v == null ? '#E3E8EF' : null, 'stroke-dasharray': v == null ? '2 2' : null }, s);
       V.tip(rect, [r + ' · ' + (/^\d{4}-/.test(c) ? c.split('-').reverse().join('/') : c + (/Hora/i.test(colC) ? ' h' : '')), V.clean(valC) + ': ' + (v == null ? 'sin dato' : pct ? fmt.p(v) : /Monto/i.test(valC) ? fmt.m(v) : fmt.n(v))]);
       if (v != null && cw > 30 && ch > 16) txt(s, L + j * cw + cw / 2, y + ch / 2 + 4, f(v), { 'text-anchor': 'middle', 'font-size': 9.5, fill: (pct ? Math.abs(v - 0.8) > 0.12 : (v - lo) / ((hi - lo) || 1) > 0.45) ? '#fff' : C.ink });
     });
     txt(s, W - R + 6, y + ch / 2 + 4, pct ? fmt.p(n ? rowTot / n : null, 0) : f(rowTot), { 'font-size': 10.5, 'font-weight': 700, fill: C.navy });
   });
   txt(s, W - R + 6, T - 6, pct ? 'Prom.' : 'Total', { 'font-size': 10, fill: C.mute });
-  txt(s, L, T + rk.length * ch + 16, V.clean(valC) + (pct ? ' · rojo = bajo ' + (/Cumplimiento/i.test(valC) ? '70' : '80') + '%, azul = arriba' : ' · más oscuro = más alto'), { 'font-size': 10, fill: C.mute });
+  txt(s, L, T + rk.length * ch + 16, V.clean(valC) + (pct ? ' · rojo = bajo ' + (/Cumplimiento/i.test(valC) ? '70' : '80') + '%, azul = arriba' : ' · más oscuro = más alto') + ' · celda punteada = sin dato', { 'font-size': 10, fill: C.mute });
 };
 
 // ---- PUNTUALIDAD (barra apilada ordenada con rampa de color) --------------------------------
@@ -347,8 +365,8 @@ CHARTS.dispersion = function (root, d) {
   var pts = d.rows.map(function (r) { return { n: r[name], g: grp ? r[grp] : '', x: V.num(r[xc]), y: V.num(r[yc]) }; }).filter(function (p) { return p.x != null && p.y != null; });
   var g = V.svg(root), s = g.s, W = g.w, H = g.h;
   if (!pts.length) { txt(s, 12, 24, 'Sin datos', { fill: C.mute }); return; }
-  var L = 62, R = 16, T = 18, B = 34;
-  var mx = Math.max.apply(null, pts.map(function (p) { return p.x; })) * 1.05 || 1, my = Math.max.apply(null, pts.map(function (p) { return p.y; })) * 1.08 || 1;
+  var L = 70, R = 24, T = 22, B = 34;
+  var mx = Math.max.apply(null, pts.map(function (p) { return p.x; })) * 1.08 || 1, my = Math.max.apply(null, pts.map(function (p) { return p.y; })) * 1.12 || 1;
   var X = function (v) { return L + v / mx * (W - L - R); }, Y = function (v) { return H - B - v / my * (H - T - B); };
   function med(a) { a = a.slice().sort(function (x, y) { return x - y; }); return a[Math.floor(a.length / 2)]; }
   var act = pts.filter(function (p) { return p.x > 0; }), qx = med(act.map(function (p) { return p.x; })), qy = med(act.map(function (p) { return p.y; }));
@@ -363,14 +381,26 @@ CHARTS.dispersion = function (root, d) {
   el('line', { x1: L, x2: W - R, y1: Y(qy), y2: Y(qy), stroke: C.slate, 'stroke-dasharray': '4 3' }, s);
   txt(s, W - R - 4, H - B - 6, 'Mucho esfuerzo, poco resultado', { 'text-anchor': 'end', 'font-size': 10, 'font-weight': 700, fill: C.red });
   txt(s, L + 6, T + 10, 'Poco esfuerzo, mucho resultado', { 'font-size': 10, 'font-weight': 700, fill: C.green });
-  txt(s, (L + W - R) / 2, H - 4, V.clean(xc) + ' (líneas punteadas = mediana del equipo)', { 'text-anchor': 'middle', 'font-size': 10, fill: C.mute });
+  txt(s, (L + W - R) / 2, H - 4, V.clean(xc) + ' →  (líneas punteadas = mediana del equipo)', { 'text-anchor': 'middle', 'font-size': 10, fill: C.mute });
+  var yt = txt(s, 12, (T + H - B) / 2, V.clean(yc) + ' →', { 'text-anchor': 'middle', 'font-size': 10, fill: C.mute }); yt.setAttribute('transform', 'rotate(-90 12 ' + (T + H - B) / 2 + ')');
   var groups = Array.from(new Set(pts.map(function (p) { return p.g; }))).sort(), pal = [C.navy, C.amber, C.teal, C.red];
+  var boxes = [];
+  function free(x, y, w) { return !boxes.some(function (b) { return x < b.x + b.w && x + w > b.x && Math.abs(y - b.y) < 11; }); }
+  // etiqueta: extremos (3 mejores y 3 peores en resultado) y el cuadrante de alerta; sin solapes
+  var byY = pts.slice().sort(function (a, b) { return b.y - a.y; });
+  var lab = new Set(byY.slice(0, 3).concat(byY.slice(-3)).concat(pts.filter(function (p) { return p.x > qx && p.y < qy * 0.9; })));
   pts.forEach(function (p) {
     var col = pal[groups.indexOf(p.g) % pal.length];
     var c = el('circle', { cx: X(p.x), cy: Y(p.y), r: 6, fill: col, 'fill-opacity': .8, stroke: '#fff', 'stroke-width': 1 }, s);
     V.tip(c, [String(p.n), V.clean(xc) + ': ' + fmt.n(p.x), V.clean(yc) + ': ' + (/Monto|Pago/i.test(yc) ? fmt.m(p.y) : fmt.n(p.y)), p.g ? V.strip(p.g) : '']);
-    var out = (p.x > qx && p.y < qy * 0.9) || p.y < qy * 0.5;
-    if (out) txt(s, X(p.x) + 8, Y(p.y) + 3, String(p.n).split(' ').slice(0, 2).join(' '), { 'font-size': 9.5, fill: C.ink });
+  });
+  Array.from(lab).forEach(function (p) {
+    var name = String(p.n).split(' ').slice(0, 2).join(' '), w = name.length * 5.4, x = X(p.x) + 9, y = Y(p.y) + 3;
+    if (x + w > W - R) x = X(p.x) - 9 - w;
+    for (var k = 0; k < 6 && !free(x, y, w); k++) y += (k % 2 ? -1 : 1) * 11 * (k + 1);
+    if (!free(x, y, w)) return;
+    boxes.push({ x: x, y: y, w: w });
+    txt(s, x, y, name, { 'font-size': 9.5, fill: C.ink });
   });
   if (grp) groups.forEach(function (gname, i) { var lx = W - R - 190, ly = T + 4 + i * 15; el('circle', { cx: lx, cy: ly, r: 5, fill: pal[i % pal.length] }, s); txt(s, lx + 9, ly + 4, V.strip(gname), { 'font-size': 10 }); });
 };
@@ -408,4 +438,34 @@ CHARTS.enjambre = function (root, d) {
       V.tip(c, [String(p.n), V.clean(vc) + ': ' + (money ? fmt.m(p.v) : fmt.n(p.v)), gn]);
     });
   });
+};
+
+// ---- RANKING (puntos ordenados con nombre) ----------------------------------------------------
+// Asesor (+ grupo) + una medida. Ordena de mayor a menor, color por grupo, mediana de referencia.
+CHARTS.ranking = function (root, d) {
+  var C = V.C, el = V.el, txt = V.txt, fmt = V.fmt;
+  var name = V.find(d.dims, /Asesor|Nombre/i) || d.dims[0], grp = d.dims.find(function (c) { return c !== name; });
+  var mcols = d.cols.filter(function (c) { return d.dims.indexOf(c) < 0; });
+  var vc = V.find(mcols, /Monto|Pago|Llamadas/i) || mcols[0], money = /Monto|Pago/i.test(vc);
+  var pts = d.rows.map(function (r) { return { n: r[name], g: grp ? V.strip(r[grp]) : '', v: V.num(r[vc]) }; })
+    .filter(function (p) { return p.v != null; }).sort(function (a, b) { return b.v - a.v; });
+  var g = V.svg(root), s = g.s, W = g.w, H = g.h;
+  if (!pts.length) { txt(s, 12, 24, 'Sin datos', { fill: C.mute }); return; }
+  var groups = Array.from(new Set(pts.map(function (p) { return p.g; }))).sort(), pal = [C.navy, C.amber, C.teal, C.red];
+  var L = Math.min(240, Math.max.apply(null, pts.map(function (p) { return String(p.n).length; })) * 6.4 + 14), R = 90, T = 22, B = 16;
+  var row = (H - T - B) / pts.length, sorted = pts.map(function (p) { return p.v; }).sort(function (a, b) { return a - b; });
+  var med = sorted[Math.floor(sorted.length / 2)], p90 = sorted[Math.floor(sorted.length * 0.9)] || sorted[sorted.length - 1];
+  var cap = Math.max(p90 * 1.15, med * 1.6), mx = Math.min(sorted[sorted.length - 1], cap) || 1;
+  var X = function (v) { return L + Math.min(v, mx) / mx * (W - L - R); };
+  el('line', { x1: X(med), x2: X(med), y1: T - 6, y2: H - B, stroke: C.slate, 'stroke-dasharray': '4 3' }, s);
+  txt(s, X(med), T - 9, 'Mediana ' + (money ? fmt.m(med) : fmt.n(med)), { 'text-anchor': 'middle', 'font-size': 10, fill: C.mute });
+  pts.forEach(function (p, i) {
+    var y = T + i * row + row / 2, col = pal[groups.indexOf(p.g) % pal.length], cut = p.v > mx;
+    txt(s, L - 8, y + 4, String(p.n), { 'text-anchor': 'end', 'font-size': Math.min(11, row * 0.8), fill: C.ink });
+    el('line', { x1: L, x2: X(p.v), y1: y, y2: y, stroke: col, 'stroke-opacity': .35, 'stroke-width': 2 }, s);
+    var c = el('circle', { cx: X(p.v), cy: y, r: Math.min(6, row * 0.4), fill: col }, s);
+    V.tip(c, [String(p.n), V.clean(vc) + ': ' + (money ? fmt.m(p.v) : fmt.n(p.v)), p.g]);
+    txt(s, X(p.v) + 9, y + 4, (money ? fmt.m(p.v) : fmt.n(p.v)) + (cut ? ' ▶' : ''), { 'font-size': Math.min(10.5, row * 0.8), fill: cut ? C.red : C.mute });
+  });
+  if (grp) groups.forEach(function (gn, i) { var lx = W - R - 170 + 0, ly = H - B - 8 - (groups.length - 1 - i) * 15; el('circle', { cx: lx, cy: ly - 3, r: 5, fill: pal[i % pal.length] }, s); txt(s, lx + 9, ly + 1, gn, { 'font-size': 10 }); });
 };
