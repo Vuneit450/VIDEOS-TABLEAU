@@ -92,6 +92,63 @@
   [
    "¿Cuánto aporta cada canal?",
    "¿Cuánto monto prometido aporta cada canal?"
+  ],
+  [
+   "formula='IF [En_P] THEN DATEDIFF(&apos;day&apos;,[Desde_E],[fecha_dt])+1 ELSEIF [En_Prev] THEN DATEDIFF(&apos;day&apos;,DATEADD(&apos;day&apos;,-(DATEDIFF(&apos;day&apos;,[Desde_E],[Hasta_E])+1),[Desde_E]),[fecha_dt])+1 END'",
+   "formula='RIGHT(&apos;0&apos;+STR((IF [En_P] THEN DATEDIFF(&apos;day&apos;,[Desde_E],[fecha_dt])+1 ELSEIF [En_Prev] THEN DATEDIFF(&apos;day&apos;,DATEADD(&apos;day&apos;,-(DATEDIFF(&apos;day&apos;,[Desde_E],[Hasta_E])+1),[Desde_E]),[fecha_dt])+1 END)),2)+&apos; · &apos;+STR(DAY(DATEADD(&apos;day&apos;,(IF [En_P] THEN DATEDIFF(&apos;day&apos;,[Desde_E],[fecha_dt])+1 ELSEIF [En_Prev] THEN DATEDIFF(&apos;day&apos;,DATEADD(&apos;day&apos;,-(DATEDIFF(&apos;day&apos;,[Desde_E],[Hasta_E])+1),[Desde_E]),[fecha_dt])+1 END)-1,[Desde_E])))+&apos;/&apos;+STR(MONTH(DATEADD(&apos;day&apos;,(IF [En_P] THEN DATEDIFF(&apos;day&apos;,[Desde_E],[fecha_dt])+1 ELSEIF [En_Prev] THEN DATEDIFF(&apos;day&apos;,DATEADD(&apos;day&apos;,-(DATEDIFF(&apos;day&apos;,[Desde_E],[Hasta_E])+1),[Desde_E]),[fecha_dt])+1 END)-1,[Desde_E])))'"
+  ],
+  [
+   "<column caption='Día del periodo' datatype='integer' name='[Dia_N]'",
+   "<column caption='Día del periodo' datatype='string' name='[Dia_N]'"
+  ],
+  [
+   "name='[Parameter 5]' param-domain-type='list' role='measure' type='nominal' value='&quot;Cumplimiento de casos&quot;'>",
+   "name='[Parameter 5]' param-domain-type='list' role='measure' type='nominal' value='&quot;Cumplimiento de llamadas&quot;'>"
+  ],
+  [
+   "<calculation class='tableau' formula='&quot;Cumplimiento de casos&quot;' />",
+   "<calculation class='tableau' formula='&quot;Cumplimiento de llamadas&quot;' />"
   ]
+ ],
+ "kpi_clones": [
+  {
+   "from": "KPI FCa",
+   "sheet": "KPI SinLl",
+   "datasource": "federated.0rvlq4v1w8nh7n18mx6q00cg2562",
+   "prefix_from": "K_FCa_",
+   "prefix_to": "K_SLl_",
+   "formula_replace": [
+    [
+     "[llamadas_salientes_dia]&gt;0 THEN MAX([casos_cobranza_dia]-[casos_marcacion_dia],0)",
+     "([llamadas_salientes_dia]=0 OR ISNULL([llamadas_salientes_dia])) AND {FIXED [fecha_dt]: SUM([llamadas_salientes_dia])}&gt;0 THEN [casos_cobranza_dia]"
+    ]
+   ],
+   "caption_replace": [
+    [
+     "caption='Casos faltantes",
+     "caption='Casos sin trabajar"
+    ]
+   ],
+   "title_replace": [
+    [
+     "📉 Casos faltantes",
+     "⚠️ Casos sin trabajar"
+    ],
+    [
+     "Para llegar a la meta diaria",
+     "Asignados a asesores que no marcaron (días con operación)"
+    ]
+   ],
+   "dashboard": "Comité",
+   "replace_zone": "Comité · Insight casos"
+  }
+ ],
+ "sheet_edits": [
+  {
+   "sheet": "Comité · Antigüedad vs recuperación",
+   "regex_remove": [
+    "<color column='[^']*\\[none:Cohorte:nk\\]' />"
+   ]
+  }
  ]
 }

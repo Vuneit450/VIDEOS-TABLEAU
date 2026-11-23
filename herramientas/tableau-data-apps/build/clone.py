@@ -14,6 +14,14 @@ raw = zin.read(twbname).decode('utf-8')
 for flag in ['<Extensions />','<VizExtensions />','<_.fcp.Packages.true...Packages />','<_.fcp.VizExtensionsDupEncodingUUID.true...VizExtensionsDupEncodingUUID />']:
     if flag not in raw:
         raw = raw.replace('<document-format-change-manifest>', '<document-format-change-manifest>\n    '+flag, 1)
+def swap_viewpoint(raw, dash, old, new):
+    # el ajuste de zoom de cada hoja en un dashboard vive en <window class='dashboard'><viewpoints>
+    pat = re.compile(r"<window class='dashboard'[^>]*name='" + re.escape(esc(dash)) + r"'>.*?</window>", re.S)
+    m = pat.search(raw)
+    if not m: return raw
+    w = m.group(0).replace(f"<viewpoint name='{esc(old)}'", f"<viewpoint name='{esc(new)}'")
+    return raw[:m.start()] + w + raw[m.end():]
+
 def esc(n): return n.replace('&','&amp;').replace("'",'&apos;')
 def ws_block(name):
     m = re.search(r"\n\s*<worksheet name='" + re.escape(esc(name)) + r"'>.*?</worksheet>", raw, re.S)
@@ -23,6 +31,48 @@ def win_block(name):
     return m
 addin = lambda aid: (f"<mark class='VizExtension' />\n            <add-in add-in-id='{aid}' extension-url='tableaulocalext:///{aid}/content/index.html' extension-version='1.0.0' instance-id='{uuid.uuid4().hex.upper()}'>"
         "<instance-settings /><type-settings><worksheet /></type-settings></add-in>")
+# --- Tarjetas KPI clonadas con otra fórmula (nativas, sin extensión) ---
+for kc in spec.get('kpi_clones', []):
+    if f"<worksheet name='{esc(kc['sheet'])}'>" in raw: continue
+    pf, pt = kc['prefix_from'], kc['prefix_to']
+    def tf(t):
+        t = t.replace(pf, pt)
+        for o, n in kc.get('formula_replace', []): t = t.replace(o, n)
+        return t
+    # 1) definiciones de cálculo en la fuente principal (primer bloque inline)
+    m = re.search(r"<datasource [^>]*inline='true'[^>]*name='" + re.escape(kc['datasource']) + r"'[^>]*>.*?</datasource>", raw, re.S)
+    ds = m.group(0)
+    defs = re.findall(r"\s*<column [^>]*name='\[" + re.escape(pf) + r"[^\]]*\]'[^>]*>\s*<calculation[^>]*/>\s*</column>", ds)
+    newdefs = ''.join(tf(d) for d in defs)
+    for o, n in kc.get('caption_replace', []): newdefs = newdefs.replace(o, n)
+    ds2 = ds.replace(defs[-1], defs[-1] + newdefs, 1)
+    raw = raw[:m.start()] + ds2 + raw[m.end():]
+    # 2) hoja y ventana
+    b = ws_block(kc['from']).group(0).replace(f"<worksheet name='{esc(kc['from'])}'>", f"<worksheet name='{esc(kc['sheet'])}'>", 1)
+    b = tf(b)
+    for o, n in kc.get('caption_replace', []) + kc.get('title_replace', []): b = b.replace(o, n)
+    b = re.sub(r"<simple-id uuid='[^']*' />", f"<simple-id uuid='{{{str(uuid.uuid4()).upper()}}}' />", b)
+    b = re.sub(r"\s*<repository-location[^>]*/>", "", b)
+    raw = raw.replace('</worksheets>', b + '\n  </worksheets>', 1)
+    w = win_block(kc['from']).group(0).replace(f"name='{esc(kc['from'])}'", f"name='{esc(kc['sheet'])}'", 1)
+    w = re.sub(r"<simple-id uuid='[^']*' />", f"<simple-id uuid='{{{str(uuid.uuid4()).upper()}}}' />", w)
+    raw = raw.replace('</windows>', w + '\n  </windows>', 1)
+    if kc.get('replace_zone'):
+        pat = re.compile(r"<dashboard[^>]*name='" + re.escape(esc(kc['dashboard'])) + r"'.*?</dashboard>", re.S)
+        mm = pat.search(raw); seg = mm.group(0)
+        seg = re.sub(r"<zone ([^>]*)name='" + re.escape(esc(kc['replace_zone'])) + r"'([^>]*?)(/?)>", lambda z: f"<zone {z.group(1)}name='{esc(kc['sheet'])}'{z.group(2)}{z.group(3)}>", seg, count=1)
+        raw = raw[:mm.start()] + seg + raw[mm.end():]
+        raw = swap_viewpoint(raw, kc['dashboard'], kc['replace_zone'], kc['sheet'])
+    print('kpi clonada', kc['sheet'], len(defs), 'cálculos')
+# --- Ediciones dentro de una hoja concreta ---
+for se in spec.get('sheet_edits', []):
+    mb = ws_block(se['sheet']); b = mb.group(0)
+    for o, n in se.get('replace', []):
+        assert o in b, 'sheet_edit sin coincidencia en ' + se['sheet'] + ': ' + o[:60]
+        b = b.replace(o, n)
+    for rx in se.get('regex_remove', []): b = re.sub(rx, '', b, flags=re.S)
+    raw = raw[:mb.start()] + b + raw[mb.end():]
+
 refs = {}
 new_ws, new_win = [], []
 for sh in spec['sheets']:
@@ -72,6 +122,7 @@ for sh in spec['sheets']:
         m = pat.search(raw); assert m, sh['dashboard']
         seg = m.group(0).replace(f"name='{esc(sh['replace_zone'])}'", f"name='{esc(sh['sheet'])}'")
         raw = raw[:m.start()] + seg + raw[m.end():]
+        raw = swap_viewpoint(raw, sh['dashboard'], sh['replace_zone'], sh['sheet'])
 # Quita selecciones de acciones guardadas al publicar (equivale a limpiar el clic; la acción sigue viva)
 for an in spec.get('clear_action_filters', []):
     col = re.escape('[' + an + ']')

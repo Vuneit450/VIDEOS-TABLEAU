@@ -67,6 +67,15 @@ Para agregar un visual: crea `CHARTS.nuevo = function (root, d) {…}` en `chart
 - **Clics guardados:** si el libro se publicó con una selección activa, las hojas que reciben esa acción quedan filtradas para todos. Busca en el `.twb` `<filter ... column='...[Action (...)]'>` con `member=`. Se limpia en la copia con `clear_action_filters` en el spec.
 - **Antes de llamar error a dos cifras distintas, revisa unidad y fecha base** (p. ej. *cuentas* con pago por fecha de asignación contra *pagos* por fecha de pago). Los títulos deben decir qué cuentan.
 
+- **Revisa el denominador de cada KPI de cumplimiento.** Si la fórmula filtra filas (p. ej. "solo asesor-días con llamadas"), puede esconder justo el problema: casos asignados a quien no trabajó. Compara contra el total sin filtro con `query-datasource` (el MCP puede consultar las fuentes embebidas pasando `workbookLuid`).
+
+## Cambios nativos (sin extensión) que soporta `clone.py`
+
+- `kpi_clones`: clona una tarjeta KPI con sus cálculos renombrados (`prefix_from` → `prefix_to`), cambia la fórmula con `formula_replace` y la pone en lugar de otra zona de un dashboard.
+- `sheet_edits`: reemplazos o `regex_remove` dentro de una sola hoja (p. ej. quitar una codificación de color).
+- `raw_replace`: reemplazos literales en todo el `.twb` (títulos, valor por omisión de un parámetro, fórmula de un cálculo).
+- Al cambiar la hoja de una zona, el copiador también traslada su ajuste de zoom (`<viewpoint>` en la ventana del dashboard). Sin eso, una tarjeta de texto sale angosta y con "#####".
+
 ## Reglas de diseño (revisión experta, 23/11/2026)
 
 - **Sankey solo si las etapas están anidadas** (cada una ≤ la anterior). Si no, el visual cambia solo a barras (TIK TOK: 711 promesas > 326 contactos clave).
