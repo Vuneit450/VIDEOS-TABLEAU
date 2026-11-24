@@ -1,0 +1,7 @@
+html,body{margin:0;height:100%;background:#fff;font-family:"Tableau Book","Segoe UI",Arial,sans-serif;color:#14202e;overflow:hidden}
+#app{width:100%;height:100%}
+svg{display:block}
+.error{color:#b3261e;padding:12px;font-size:13px}
+#tip{position:fixed;pointer-events:none;background:#14202e;color:#fff;font-size:12px;line-height:1.4;padding:8px 10px;border-radius:4px;max-width:280px;display:none;z-index:9;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#tip b{font-weight:600}
+text{font-family:inherit}

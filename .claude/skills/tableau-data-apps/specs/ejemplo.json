@@ -1,0 +1,83 @@
+{
+ "_comentario": "Spec de ejemplo. Copia este archivo, cambia los nombres de hojas y dashboards por los de tu libro y quita las claves que no uses.",
+ "apps": [
+  {
+   "id": "com.binatsa.viz",
+   "name": "Binatsa Viz",
+   "content_dir": ".claude/skills/tableau-data-apps/viz"
+  }
+ ],
+ "fix_size": [
+  "<Dashboard con tamaño por rango>"
+ ],
+ "clear_action_filters": [
+  "Action (<Nombre de la acción>)"
+ ],
+ "raw_replace": [
+  [
+   "<texto exacto del .twb>",
+   "<reemplazo>"
+  ]
+ ],
+ "sheets": [
+  {
+   "from": "<Hoja de embudo original>",
+   "sheet": "X Sankey · <Título>",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "<Dashboard>",
+   "replace_zone": "<Hoja de embudo original>"
+  },
+  {
+   "from": "<Hoja con agentes y una medida>",
+   "sheet": "X Ranking · <Título>",
+   "app": "com.binatsa.viz",
+   "hidden": true,
+   "dashboard": "<Dashboard>",
+   "replace_zone": "<Hoja original>",
+   "title_replace": [
+    [
+     "<título viejo>",
+     "<título nuevo>"
+    ]
+   ]
+  }
+ ],
+ "kpi_clones": [
+  {
+   "from": "<Tarjeta KPI original>",
+   "sheet": "<Tarjeta nueva>",
+   "datasource": "<federated.xxxx>",
+   "prefix_from": "<K_Xxx_>",
+   "prefix_to": "<K_Yyy_>",
+   "formula_replace": [
+    [
+     "<fragmento de fórmula>",
+     "<nuevo fragmento>"
+    ]
+   ],
+   "caption_replace": [
+    [
+     "caption='<Nombre viejo>",
+     "caption='<Nombre nuevo>"
+    ]
+   ],
+   "title_replace": [
+    [
+     "<título viejo>",
+     "<título nuevo>"
+    ]
+   ],
+   "dashboard": "<Dashboard>",
+   "replace_zone": "<Zona a reemplazar>"
+  }
+ ],
+ "sheet_edits": [
+  {
+   "sheet": "<Hoja>",
+   "regex_remove": [
+    "<color column='[^']*\\[none:<Campo>:nk\\]' />"
+   ]
+  }
+ ]
+}
